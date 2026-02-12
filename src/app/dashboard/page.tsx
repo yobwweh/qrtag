@@ -90,21 +90,21 @@ export default function DashboardPage() {
             className={`px-4 py-2 rounded-full font-semibold text-sm transition-colors ${filter === "all" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
               }`}
           >
-            All Items
+            Tous
           </button>
           <button
             onClick={() => setFilter("assigned")}
             className={`px-4 py-2 rounded-full font-semibold text-sm transition-colors ${filter === "assigned" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
               }`}
           >
-            In Stock
+            En Stock
           </button>
           <button
             onClick={() => setFilter("free")}
             className={`px-4 py-2 rounded-full font-semibold text-sm transition-colors ${filter === "free" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
               }`}
           >
-            Available
+            Disponibles
           </button>
           <div className="ml-auto">
             <Link

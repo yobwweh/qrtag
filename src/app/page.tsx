@@ -30,10 +30,10 @@ export default function HomePage() {
 
         {/* TITLE */}
         <h2 className="text-4xl md:text-5xl font-black text-gray-900 text-center mb-3">
-          Central Logistics Hub
+          Hub Logistique Central
         </h2>
         <p className="text-gray-600 text-center max-w-md mb-12">
-          Manage inventory flow and generate assets. Scan a tag to begin.
+          Gérez le flux d'inventaire et générez des actifs. Scannez un tag pour commencer.
         </p>
 
         {/* CARDS GRID */}
@@ -46,12 +46,12 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Inventory</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Inventaire</h3>
               <p className="text-sm text-gray-500 mb-4">
-                Manage stock levels, location transfers, and audit history.
+                Gérez les niveaux de stock, les transferts et l'historique.
               </p>
               <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1">
-                View Dashboard →
+                Voir le Tableau →
               </span>
             </div>
           </Link>
@@ -65,8 +65,8 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-black text-white mb-2">SCAN NOW</h3>
-              <p className="text-sm text-blue-100">Press Spacebar to Scan</p>
+              <h3 className="text-2xl font-black text-white mb-2">SCANNER</h3>
+              <p className="text-sm text-blue-100">Appuyez sur Espace pour Scanner</p>
             </div>
           </Link>
 
@@ -78,12 +78,12 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Generator</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Générateur</h3>
               <p className="text-sm text-gray-500 mb-4">
-                Create new asset tags, batch print labels, and assign IDs.
+                Créez de nouveaux tags, imprimez des étiquettes et attribuez des IDs.
               </p>
               <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1">
-                Create New Tag →
+                Créer un Tag →
               </span>
             </div>
           </Link>
