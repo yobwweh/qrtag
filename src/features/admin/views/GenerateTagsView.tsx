@@ -24,8 +24,8 @@ export const GenerateTagsView = ({ count = 25 }: { count?: number }) => {
     <div className="p-4 md:p-8 bg-slate-50 min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-10 gap-4 no-print bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-200">
         <div className="flex items-center gap-3 md:gap-4">
-          {/* RETOUR VERS DASHBOARD */}
-          <Link href="/dashboard" className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold hover:bg-slate-200 transition-all">
+          {/* RETOUR VERS ACCUEIL */}
+          <Link href="/" className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold hover:bg-slate-200 transition-all">
             ←
           </Link>
           <div>
