@@ -75,12 +75,12 @@ export default function DashboardPage() {
         {/* TITRE & STATS */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Inventory Overview
+            Vue d'Ensemble de l'Inventaire
             <span className="ml-3 text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-              {tags.length} ITEMS
+              {tags.length} ÉLÉMENTS
             </span>
           </h2>
-          <p className="text-gray-600">Manage stock levels and track asset locations in real-time.</p>
+          <p className="text-gray-600">Gérez les niveaux de stock et suivez les emplacements en temps réel.</p>
         </div>
 
         {/* FILTRES */}
@@ -114,7 +114,7 @@ export default function DashboardPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              New Entry
+              Nouvelle Entrée
             </Link>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                     <div className={`w-1.5 h-1.5 rounded-full ${tag.isAssigned ? "bg-blue-600" : "bg-gray-400"}`}></div>
                     {tag.id}
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mt-2">{tag.reference || "Unassigned Tag"}</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mt-2">{tag.reference || "Tag Non Assigné"}</h3>
                   <p className="text-xs text-gray-500 mt-1">ID: {tag.id}</p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
                   </div>
                 ))}
                 {Object.keys(tag.metadata).length === 0 && (
-                  <p className="text-xs text-gray-400 italic">No metadata</p>
+                  <p className="text-xs text-gray-400 italic">Aucune métadonnée</p>
                 )}
               </div>
 
@@ -155,14 +155,14 @@ export default function DashboardPage() {
                   href={`/scan/${tag.id}`}
                   className="flex-1 text-center py-2 px-3 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-blue-600 hover:text-white transition-colors"
                 >
-                  Edit
+                  Modifier
                 </Link>
                 {tag.isAssigned && (
                   <button
                     onClick={(e) => handleResetTag(e, tag.id)}
                     className="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg text-sm font-semibold transition-colors"
                   >
-                    Release
+                    Libérer
                   </button>
                 )}
               </div>
@@ -186,9 +186,9 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-gray-500">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span>System Online</span>
+            <span>Système En Ligne</span>
           </div>
-          <span>Server: US-East-1 · Latency: 24ms</span>
+          <span>Serveur: US-East-1 · Latence: 24ms</span>
         </div>
       </footer>
     </main>
