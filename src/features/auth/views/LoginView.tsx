@@ -52,7 +52,7 @@ export function LoginView() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all [&:-webkit-autofill]:bg-white [&:-webkit-autofill]:text-inherit [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset_!important]"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all [&:-webkit-autofill]:bg-white [&:-webkit-autofill]:text-gray-900 [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset_!important] [&:-webkit-autofill]:-webkit-text-fill-color:rgb(17,24,39)"
                                 placeholder="votre@email.com"
                                 disabled={loading}
                             />
@@ -69,7 +69,7 @@ export function LoginView() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all [&:-webkit-autofill]:bg-white [&:-webkit-autofill]:text-inherit [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset_!important]"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all [&:-webkit-autofill]:bg-white [&:-webkit-autofill]:text-gray-900 [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset_!important] [&:-webkit-autofill]:-webkit-text-fill-color:rgb(17,24,39)"
                                 placeholder="••••••••"
                                 disabled={loading}
                             />
