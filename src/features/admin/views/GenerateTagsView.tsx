@@ -25,8 +25,10 @@ export const GenerateTagsView = ({ count = 25 }: { count?: number }) => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-10 gap-4 no-print bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-200">
         <div className="flex items-center gap-3 md:gap-4">
           {/* RETOUR VERS ACCUEIL */}
-          <Link href="/" className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold hover:bg-slate-200 transition-all">
-            ←
+          <Link href="/" className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-700 transition-colors">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
           </Link>
           <div>
             <h1 className="text-xl md:text-2xl font-black text-slate-900">Générateur</h1>
