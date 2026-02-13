@@ -1,9 +1,9 @@
-"use client";
-
 import React from "react";
 import { useRouter } from "next/navigation";
 import { QRCodeScanner } from "@/features/scanner/views/QRCodeScanner";
 import Link from "next/link";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { UserMenu } from "@/components/UserMenu";
 
 export default function ScanPage() {
     const router = useRouter();
@@ -36,19 +36,25 @@ export default function ScanPage() {
     };
 
     return (
-        <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
-            <Link href="/dashboard" className="absolute top-6 left-6 w-12 h-12 bg-white/10 text-white rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all">
-                ←
-            </Link>
+        <ProtectedRoute>
+            <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 relative">
+                <Link href="/dashboard" className="absolute top-6 left-6 w-12 h-12 bg-white/10 text-white rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all z-10">
+                    ←
+                </Link>
 
-            <div className="text-center mb-8">
-                <h1 className="text-3xl font-black text-white italic tracking-tighter mb-2">SCANNER</h1>
-                <p className="text-slate-400 text-sm font-medium">Visez le QR Code du tag</p>
-            </div>
+                <div className="absolute top-6 right-6 z-10">
+                    <UserMenu />
+                </div>
 
-            <div className="w-full">
-                <QRCodeScanner onScanSuccess={handleScan} />
-            </div>
-        </main>
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-black text-white italic tracking-tighter mb-2">SCANNER</h1>
+                    <p className="text-slate-400 text-sm font-medium">Visez le QR Code du tag</p>
+                </div>
+
+                <div className="w-full">
+                    <QRCodeScanner onScanSuccess={handleScan} />
+                </div>
+            </main>
+        </ProtectedRoute>
     );
 }

@@ -1,5 +1,10 @@
 import { GenerateTagsView } from "@/features/admin/views/GenerateTagsView";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 export default function AdminPage() {
-  return <GenerateTagsView count={25} />;
+  return (
+    <ProtectedRoute>
+      <GenerateTagsView count={25} />
+    </ProtectedRoute>
+  );
 }

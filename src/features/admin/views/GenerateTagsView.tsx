@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
+import { UserMenu } from "@/components/UserMenu";
 
 export const GenerateTagsView = ({ count = 25 }: { count?: number }) => {
   const [origin, setOrigin] = useState("");
@@ -35,7 +36,8 @@ export const GenerateTagsView = ({ count = 25 }: { count?: number }) => {
             <p className="text-slate-500 text-xs md:text-sm">Planche de {count} QR Codes</p>
           </div>
         </div>
-        <div className="flex gap-2 md:gap-3 w-full md:w-auto">
+        <div className="flex gap-2 md:gap-3 w-full md:w-auto items-center">
+          <UserMenu />
           <button onClick={generateNewSet} className="flex-1 md:flex-none px-4 md:px-5 py-2 border border-slate-200 rounded-xl font-bold text-xs md:text-sm hover:bg-slate-50">Régénérer</button>
           <button onClick={() => window.print()} className="flex-1 md:flex-none bg-blue-600 text-white px-4 md:px-6 py-2 rounded-xl font-bold text-xs md:text-sm shadow-lg shadow-blue-100 hover:bg-blue-700">Imprimer</button>
         </div>
