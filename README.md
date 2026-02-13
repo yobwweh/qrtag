@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QRTag Pro - Logistics Management System
 
-## Getting Started
+**QRTag Pro** est une application web moderne de gestion logistique (WMS - Warehouse Management System) basée sur l'utilisation intensive de QR Codes pour le suivi d'inventaire en temps réel.
 
-First, run the development server:
+![QRTag Pro Banner](public/banner.png) <!-- Vous pourrez ajouter une image plus tard -->
 
+## Fonctionnalités Clés
+
+- **Authentification Sécurisée** : Système de connexion robuste géré par Supabase (Email/Mot de passe).
+- **Scanner Mobile Intégré** : Scannez des QR Codes directement depuis le navigateur de votre smartphone/tablette sans application tierce.
+- **Générateur de Tags (Admin)** : Créez et imprimez des planches de QR Codes uniques pour étiqueter vos produits.
+- **Gestion d'Inventaire** :
+  - **Injection** : Assignez un tag vierge à un produit/lot spécifique.
+  - **Libération** : Réinitialisez un tag pour le réutiliser.
+  - **Consultation** : Accédez instantanément aux détails d'un produit via son scan.
+- **Sécurité** : Protection intégrale des routes sensibles via Middleware et Auth Guards.
+
+## Stack Technique
+
+Ce projet utilise les technologies les plus récentes pour garantir performance et maintenabilité :
+
+- **Framework** : [Next.js 14](https://nextjs.org/) (App Router & Server Actions)
+- **Langage** : [TypeScript](https://www.typescriptlang.org/)
+- **Style** : [Tailwind CSS](https://tailwindcss.com/)
+- **Base de Données & Auth** : [Supabase](https://supabase.com/)
+- **Scan** : `html5-qrcode` & `react-qr-code`
+- **Déploiement** : [Vercel](https://vercel.com/)
+
+## Installation et Démarrage
+
+Suivez ces étapes pour lancer le projet en local :
+
+### 1. Cloner le projet
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/votre-username/qrtag.git
+cd qrtag
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Installer les dépendances
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Configurer les variables d'environnement
+Créez un fichier `.env.local` à la racine du projet et ajoutez vos clés Supabase :
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_SUPABASE_URL=votre_url_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre_clé_anon_supabase
+```
 
-## Learn More
+### 4. Lancer le serveur de développement
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Structure du Projet
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                 # Routes Next.js (App Router)
+│   ├── (auth)/          # Pages d'authentification
+│   ├── dashboard/       # Tableau de bord principal
+│   ├── scan/            # Module de scan
+│   └── admin/           # Outils d'administration
+├── components/          # Composants UI réutilisables
+├── features/            # Logique métier par fonctionnalité
+│   ├── auth/            # Services, Context, Views pour l'Auth
+│   ├── scanner/         # Logique du lecteur QR
+│   └── tags/            # Gestion des tags (CRUD)
+└── lib/                 # Utilitaires et clients (Supabase)
+```
 
-## Deploy on Vercel
+## Contribuer
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Les contributions sont les bienvenues ! Pour des changements majeurs, veuillez d'abord ouvrir une issue pour discuter de ce que vous souhaitez changer.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Créateur
+
+Développé   par **Yobwweh**
+
+
+## Licence
+
+[MIT](https://choosealicense.com/licenses/mit/)
