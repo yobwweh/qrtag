@@ -79,8 +79,7 @@ Les contributions sont les bienvenues ! Pour des changements majeurs, veuillez d
 
 ## Créateur
 
-Développé   par **Yobwweh**
-
+Développé avec ❤️ par **Yobwweh**
 
 ## Licence
 
