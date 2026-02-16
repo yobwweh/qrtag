@@ -1,3 +1,5 @@
+"use client";
+
 import React, { use, useState, useEffect, useRef } from "react";
 import { useTagController } from "@/features/tags/controllers/tag.controller";
 import Link from "next/link";

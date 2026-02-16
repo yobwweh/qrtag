@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Tag, createEmptyTag } from "../models/tag.model";
 import { TagService } from "../services/tag.service";
