@@ -15,16 +15,24 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
     const [hasTorch, setHasTorch] = useState(false);
     const [torchOn, setTorchOn] = useState(false);
 
-    // Paramètres utilisateur
+    // États pour l'UI (boutons)
     const [useAudio, setUseAudio] = useState(true);
     const [useVibration, setUseVibration] = useState(true);
     const [useOverlay, setUseOverlay] = useState(true);
 
+    // Refs pour éviter de redémarrer le scanner quand on change les options
+    const audioRef = useRef(true);
+    const vibrationRef = useRef(true);
     const scannerRef = useRef<Html5Qrcode | null>(null);
+    const torchRef = useRef(false);
+
+    // Synchronisation des refs avec le state
+    useEffect(() => { audioRef.current = useAudio; }, [useAudio]);
+    useEffect(() => { vibrationRef.current = useVibration; }, [useVibration]);
 
     // Fonction pour le retour sonore (Beep)
     const playBeep = useCallback(() => {
-        if (!useAudio) return;
+        if (!audioRef.current) return;
         try {
             const context = new (window.AudioContext || (window as any).webkitAudioContext)();
             const oscillator = context.createOscillator();
@@ -38,24 +46,46 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
             gain.gain.linearRampToValueAtTime(0, context.currentTime + 0.1);
             oscillator.start(context.currentTime);
             oscillator.stop(context.currentTime + 0.1);
+
+            // Fermer le contexte après usage pour libérer les ressources
+            setTimeout(() => context.close(), 200);
         } catch (e) {
             console.error("Audio error", e);
         }
-    }, [useAudio]);
+    }, []);
 
     // Fonction pour la vibration
     const triggerVibration = useCallback(() => {
-        if (!useVibration || !navigator.vibrate) return;
-        navigator.vibrate(50); // Petite vibration de 50ms
-    }, [useVibration]);
+        if (!vibrationRef.current || !navigator.vibrate) return;
+        try {
+            navigator.vibrate(80); // Un peu plus long pour être mieux senti (80ms)
+        } catch (e) {
+            console.error("Vibration error", e);
+        }
+    }, []);
+
+    const stopTorchForcefully = async () => {
+        if (scannerRef.current && torchRef.current) {
+            try {
+                await scannerRef.current.applyVideoConstraints({
+                    advanced: [{ torch: false }] as any
+                });
+                torchRef.current = false;
+                setTorchOn(false);
+            } catch (e) {
+                console.warn("Could not force stop torch", e);
+            }
+        }
+    };
 
     const toggleTorch = async () => {
         if (!scannerRef.current || !hasTorch) return;
         try {
-            const nextState = !torchOn;
+            const nextState = !torchRef.current;
             await scannerRef.current.applyVideoConstraints({
                 advanced: [{ torch: nextState }] as any
             });
+            torchRef.current = nextState;
             setTorchOn(nextState);
         } catch (err) {
             console.error("Torch error:", err);
@@ -63,6 +93,8 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
     };
 
     useEffect(() => {
+        let isAlive = true;
+
         const startScanner = async () => {
             try {
                 setError(null);
@@ -75,7 +107,8 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
                         fps: 15,
                         qrbox: { width: 250, height: 250 }
                     },
-                    (decodedText) => {
+                    async (decodedText) => {
+                        if (!isAlive) return;
                         console.log("QR Code détecté:", decodedText);
                         setScanResult(decodedText);
 
@@ -83,34 +116,55 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
                         playBeep();
                         triggerVibration();
 
+                        // Éteindre la lampe avant de stopper
+                        await stopTorchForcefully();
+
                         html5QrCode.stop().then(() => {
-                            onScanSuccess(decodedText);
+                            if (isAlive) onScanSuccess(decodedText);
+                        }).catch(err => {
+                            console.warn("Stop error during success:", err);
+                            if (isAlive) onScanSuccess(decodedText);
                         });
                     },
                     (errorMessage) => { }
                 );
 
-                setIsScanning(true);
+                if (isAlive) {
+                    setIsScanning(true);
 
-                // Vérifier si la lampe est disponible
-                const capabilities = html5QrCode.getRunningTrackCapabilities();
-                if (capabilities && (capabilities as any).torch) {
-                    setHasTorch(true);
+                    // Vérifier si la lampe est disponible
+                    try {
+                        const capabilities = html5QrCode.getRunningTrackCapabilities();
+                        if (capabilities && (capabilities as any).torch) {
+                            setHasTorch(true);
+                        }
+                    } catch (e) {
+                        console.warn("Could not get capabilities", e);
+                    }
                 }
 
             } catch (err: any) {
-                console.error("Erreur démarrage scanner:", err);
-                setError(`Erreur: ${err.message || "Impossible d'accéder à la caméra"}`);
+                if (isAlive) {
+                    console.error("Erreur démarrage scanner:", err);
+                    setError(`Erreur: ${err.message || "Impossible d'accéder à la caméra"}`);
+                }
             }
         };
 
         startScanner();
 
         return () => {
-            if (scannerRef.current && isScanning) {
-                scannerRef.current.stop().catch(console.error);
+            isAlive = false;
+            if (scannerRef.current) {
+                // S'assurer d'éteindre la torche
+                stopTorchForcefully().finally(() => {
+                    if (scannerRef.current?.isScanning) {
+                        scannerRef.current.stop().catch(err => console.warn("Clean stop error:", err));
+                    }
+                });
             }
         };
+        // On ne dépend PLUS que de onScanSuccess pour ne pas rafraîchir à cause d'un toggle
     }, [onScanSuccess, playBeep, triggerVibration]);
 
     return (
@@ -151,7 +205,8 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
                 {hasTorch && isScanning && !scanResult && (
                     <button
                         onClick={toggleTorch}
-                        className={`absolute top-4 right-4 w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${torchOn ? 'bg-yellow-400 text-black' : 'bg-black/40 text-white backdrop-blur-md'}`}
+                        type="button"
+                        className={`absolute top-4 right-4 w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${torchOn ? 'bg-yellow-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.5)]' : 'bg-black/40 text-white backdrop-blur-md'}`}
                     >
                         <svg className="w-6 h-6" fill={torchOn ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9l-.707.707M12 18c-3.313 0-6-2.687-6-6s2.687-6 6-6 6 2.687 6 6-2.687 6-6 6z" />
@@ -164,6 +219,7 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
             <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm grid grid-cols-3 gap-2">
                 <button
                     onClick={() => setUseAudio(!useAudio)}
+                    type="button"
                     className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${useAudio ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400'}`}
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,15 +229,17 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
                 </button>
                 <button
                     onClick={() => setUseVibration(!useVibration)}
+                    type="button"
                     className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${useVibration ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400'}`}
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-[10px] font-bold uppercase tracking-tight">Vibre</span>
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Vibrer</span>
                 </button>
                 <button
                     onClick={() => setUseOverlay(!useOverlay)}
+                    type="button"
                     className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${useOverlay ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400'}`}
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
