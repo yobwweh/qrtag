@@ -98,7 +98,7 @@ export default function HomePage() {
 
         {/* FOOTER */}
         <footer className="bg-white border-t border-gray-200 px-6 py-4 text-center">
-          <p className="text-xs text-gray-400">© 2023 QRTAG Logistics Systems. v4.2.0-stable</p>
+          <p className="text-xs text-gray-400">© 2026 QRTAG Logistics Systems. </p>
         </footer>
       </main>
     </ProtectedRoute>
