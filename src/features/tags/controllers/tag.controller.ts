@@ -35,7 +35,11 @@ export const useTagController = (tagId: string) => {
     setIsSubmitting(true);
     const updatedTag = { ...tag, reference, isAssigned: true };
     const result = await TagService.saveTag(updatedTag);
-    if (!result.success) alert("Erreur : " + result.error.message);
+    if (result.success) {
+      setTag(updatedTag); // Mise à jour locale pour un retour immédiat
+    } else {
+      alert("Erreur : " + result.error.message);
+    }
     setIsSubmitting(false);
   };
 
