@@ -1,7 +1,7 @@
 "use client";
 
 import { Html5Qrcode } from "html5-qrcode";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface QRCodeScannerProps {
     onScanSuccess: (decodedText: string) => void;
@@ -12,39 +12,92 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
     const [scanResult, setScanResult] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isScanning, setIsScanning] = useState(false);
+    const [hasTorch, setHasTorch] = useState(false);
+    const [torchOn, setTorchOn] = useState(false);
+
+    // Paramètres utilisateur
+    const [useAudio, setUseAudio] = useState(true);
+    const [useVibration, setUseVibration] = useState(true);
+    const [useOverlay, setUseOverlay] = useState(true);
+
     const scannerRef = useRef<Html5Qrcode | null>(null);
+
+    // Fonction pour le retour sonore (Beep)
+    const playBeep = useCallback(() => {
+        if (!useAudio) return;
+        try {
+            const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gain = context.createGain();
+            oscillator.type = "sine";
+            oscillator.frequency.setValueAtTime(800, context.currentTime);
+            oscillator.connect(gain);
+            gain.connect(context.destination);
+            gain.gain.setValueAtTime(0, context.currentTime);
+            gain.gain.linearRampToValueAtTime(0.5, context.currentTime + 0.01);
+            gain.gain.linearRampToValueAtTime(0, context.currentTime + 0.1);
+            oscillator.start(context.currentTime);
+            oscillator.stop(context.currentTime + 0.1);
+        } catch (e) {
+            console.error("Audio error", e);
+        }
+    }, [useAudio]);
+
+    // Fonction pour la vibration
+    const triggerVibration = useCallback(() => {
+        if (!useVibration || !navigator.vibrate) return;
+        navigator.vibrate(50); // Petite vibration de 50ms
+    }, [useVibration]);
+
+    const toggleTorch = async () => {
+        if (!scannerRef.current || !hasTorch) return;
+        try {
+            const nextState = !torchOn;
+            await scannerRef.current.applyVideoConstraints({
+                advanced: [{ torch: nextState }] as any
+            });
+            setTorchOn(nextState);
+        } catch (err) {
+            console.error("Torch error:", err);
+        }
+    };
 
     useEffect(() => {
         const startScanner = async () => {
             try {
                 setError(null);
-                console.log("Initialisation du scanner...");
-
                 const html5QrCode = new Html5Qrcode("reader");
                 scannerRef.current = html5QrCode;
 
-                console.log("Demande d'accès à la caméra...");
-
                 await html5QrCode.start(
-                    { facingMode: "environment" }, // Caméra arrière sur mobile
+                    { facingMode: "environment" },
                     {
-                        fps: 10,
+                        fps: 15,
                         qrbox: { width: 250, height: 250 }
                     },
                     (decodedText) => {
                         console.log("QR Code détecté:", decodedText);
                         setScanResult(decodedText);
+
+                        // Feedbacks
+                        playBeep();
+                        triggerVibration();
+
                         html5QrCode.stop().then(() => {
                             onScanSuccess(decodedText);
                         });
                     },
-                    (errorMessage) => {
-                        // Ignore les erreurs répétées (normales)
-                    }
+                    (errorMessage) => { }
                 );
 
                 setIsScanning(true);
-                console.log("Scanner démarré avec succès !");
+
+                // Vérifier si la lampe est disponible
+                const capabilities = html5QrCode.getRunningTrackCapabilities();
+                if (capabilities && (capabilities as any).torch) {
+                    setHasTorch(true);
+                }
+
             } catch (err: any) {
                 console.error("Erreur démarrage scanner:", err);
                 setError(`Erreur: ${err.message || "Impossible d'accéder à la caméra"}`);
@@ -58,41 +111,103 @@ export const QRCodeScanner = ({ onScanSuccess, onScanFailure }: QRCodeScannerPro
                 scannerRef.current.stop().catch(console.error);
             }
         };
-    }, [onScanSuccess]);
+    }, [onScanSuccess, playBeep, triggerVibration]);
 
     return (
-        <div className="w-full max-w-md mx-auto">
+        <div className="w-full max-w-md mx-auto space-y-4">
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-4">
-                    <p className="font-bold">Erreur</p>
-                    <p className="text-sm">{error}</p>
-                    <p className="text-xs mt-2">Assurez-vous d'autoriser l'accès à la caméra.</p>
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl mb-4 text-sm font-medium">
+                    <p>{error}</p>
                 </div>
             )}
 
-            <div
-                id="reader"
-                className="rounded-2xl overflow-hidden bg-black min-h-[300px]"
-            ></div>
+            <div className="relative group">
+                <div
+                    id="reader"
+                    className="rounded-3xl overflow-hidden bg-black min-h-[300px] border-4 border-white shadow-2xl relative"
+                ></div>
+
+                {/* OVERLAY LASER & CADRE */}
+                {isScanning && !scanResult && useOverlay && (
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                        <div className="w-[250px] h-[250px] border-2 border-blue-500/50 rounded-xl relative overflow-hidden">
+                            {/* Coins du cadre */}
+                            <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-blue-600 rounded-tl-lg"></div>
+                            <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-blue-600 rounded-tr-lg"></div>
+                            <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-blue-600 rounded-bl-lg"></div>
+                            <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-blue-600 rounded-br-lg"></div>
+
+                            {/* Ligne Laser animée */}
+                            <div className="absolute w-full h-[2px] bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)] animate-scan-laser"></div>
+                        </div>
+                        {/* Texte de guidage */}
+                        <div className="absolute bottom-10 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-bold tracking-wider">
+                            ALIGNEZ LE QR CODE
+                        </div>
+                    </div>
+                )}
+
+                {/* BOUTON TORCHE (Apparaît si dispo) */}
+                {hasTorch && isScanning && !scanResult && (
+                    <button
+                        onClick={toggleTorch}
+                        className={`absolute top-4 right-4 w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${torchOn ? 'bg-yellow-400 text-black' : 'bg-black/40 text-white backdrop-blur-md'}`}
+                    >
+                        <svg className="w-6 h-6" fill={torchOn ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9l-.707.707M12 18c-3.313 0-6-2.687-6-6s2.687-6 6-6 6 2.687 6 6-2.687 6-6 6z" />
+                        </svg>
+                    </button>
+                )}
+            </div>
+
+            {/* OPTIONS DE SCANNER */}
+            <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm grid grid-cols-3 gap-2">
+                <button
+                    onClick={() => setUseAudio(!useAudio)}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${useAudio ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400'}`}
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Audio</span>
+                </button>
+                <button
+                    onClick={() => setUseVibration(!useVibration)}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${useVibration ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400'}`}
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Vibre</span>
+                </button>
+                <button
+                    onClick={() => setUseOverlay(!useOverlay)}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${useOverlay ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400'}`}
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Viseur</span>
+                </button>
+            </div>
 
             {scanResult && (
-                <p className="text-center mt-4 font-bold text-green-400 animate-pulse">
-                    ✓ Code détecté ! Redirection...
+                <p className="text-center font-black text-blue-600 animate-bounce uppercase tracking-widest bg-blue-50 py-3 rounded-2xl">
+                    🎯 Code Détecté !
                 </p>
             )}
 
-            {!error && !scanResult && !isScanning && (
-                <div className="text-center mt-4">
-                    <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                    <p className="text-slate-400 text-sm">Initialisation de la caméra...</p>
-                </div>
-            )}
-
-            {isScanning && !scanResult && (
-                <p className="text-center mt-4 text-green-400 text-sm">
-                    📷 Caméra active - Visez le QR code
-                </p>
-            )}
+            <style jsx global>{`
+                @keyframes scan-laser {
+                    0% { top: 0; }
+                    50% { top: 100%; }
+                    100% { top: 0; }
+                }
+                .animate-scan-laser {
+                    animation: scan-laser 2s linear infinite;
+                }
+            `}</style>
         </div>
     );
 };
