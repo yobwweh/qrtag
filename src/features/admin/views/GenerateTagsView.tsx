@@ -5,7 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 import { UserMenu } from "@/components/UserMenu";
 
-export const GenerateTagsView = ({ count = 25 }: { count?: number }) => {
+export const GenerateTagsView = ({ count = 50 }: { count?: number }) => {
   const [origin, setOrigin] = useState("");
   const [tags, setTags] = useState<{ id: string }[]>([]);
 
@@ -15,8 +15,12 @@ export const GenerateTagsView = ({ count = 25 }: { count?: number }) => {
   }, []);
 
   const generateNewSet = () => {
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD
+    const sessionRandom = Math.floor(1000 + Math.random() * 9000);
+
     const newTags = Array.from({ length: count }, (_, i) => ({
-      id: `QT-${Math.floor(1000 + Math.random() * 9000)}-${i + 1}`,
+      id: `QT-${dateStr}-${sessionRandom}-${i + 1}`,
     }));
     setTags(newTags);
   };
@@ -49,11 +53,12 @@ export const GenerateTagsView = ({ count = 25 }: { count?: number }) => {
             {origin ? (
               <QRCodeSVG
                 value={`${origin}/scan/${tag.id}`}
-                size={typeof window !== 'undefined' && window.innerWidth < 768 ? 80 : 110}
+                size={typeof window !== 'undefined' && window.innerWidth < 768 ? 85 : 120}
                 level="H"
+                includeMargin={true}
               />
             ) : (
-              <div className="w-[80px] md:w-[110px] h-[80px] md:h-[110px] bg-slate-100 animate-pulse rounded" />
+              <div className="w-[85px] md:w-[120px] h-[85px] md:h-[120px] bg-slate-100 animate-pulse rounded" />
             )}
             <p className="mt-2 md:mt-3 font-mono text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-tighter text-center break-all">{tag.id}</p>
           </div>
