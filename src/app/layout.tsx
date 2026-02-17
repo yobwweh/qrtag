@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "QRTag - Gestion de QR Codes",
+  metadataBase: new URL('https://qrtag-pro.vercel.app'),
+  title: "QRTag Pro - Gestion de QR Codes",
   description: "Solution complète de gestion et de suivi par QR code. Scannez, attribuez et gérez vos tags facilement.",
 };
 
