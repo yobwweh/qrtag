@@ -144,7 +144,7 @@ export const QRCodeScanner = ({ onScanSuccess }: QRCodeScannerProps) => {
 
             {state.scanResult && (
                 <p className="text-center font-black text-blue-600 animate-bounce uppercase tracking-widest bg-blue-50 py-3 rounded-2xl">
-                    🎯 Code Détecté !
+                    Code Détecté !
                 </p>
             )}
 

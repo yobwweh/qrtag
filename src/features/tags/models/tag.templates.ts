@@ -50,5 +50,49 @@ export const TAG_TEMPLATES: Record<string, TagTemplate> = {
             "Date_Archivage": "",
             "Responsable": ""
         }
+    },
+    Colis: {
+        id: "Colis",
+        label: "Colis / Expédition",
+        icon: "📦",
+        placeholder: "ex: TR-123456",
+        defaultMetadata: {
+            "Transporteur": "",
+            "Poids": "",
+            "Destination": ""
+        }
+    },
+    Vehicule: {
+        id: "Vehicule",
+        label: "Véhicule / Flotte",
+        icon: "🚚",
+        placeholder: "ex: AA-123-BB",
+        defaultMetadata: {
+            "Modèle": "",
+            "Kilométrage": "",
+            "Dernier_Contrôle": ""
+        }
+    },
+    Employe: {
+        id: "Employe",
+        label: "Badge Employé",
+        icon: "👤",
+        placeholder: "ex: EMP-889",
+        defaultMetadata: {
+            "Nom": "",
+            "Poste": "",
+            "Zone_Autorisée": ""
+        }
+    },
+    Maintenance: {
+        id: "Maintenance",
+        label: "Point de Maintenance",
+        icon: "⚙️",
+        placeholder: "ex: CLIM-02",
+        defaultMetadata: {
+            "Fréquence": "Mensuel",
+            "Dernier_Passage": "",
+            "Technicien": ""
+        }
     }
 };
