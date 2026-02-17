@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Tag } from "../models/tag.model";
+import { HistoryService } from "@/features/history/services/history.service";
 
 export const TagService = {
   /**
@@ -62,8 +63,13 @@ export const TagService = {
       })
       .select();
 
-    if (error) {
-      console.error("Erreur Supabase lors de la sauvegarde:", error.message);
+    if (!error) {
+      await HistoryService.logActivity({
+        tagId: tag.id,
+        action: 'INJECTION',
+        details: `Injection de l'actif type ${tag.category}`,
+        reference: tag.reference
+      });
     }
 
     return { success: !error, error };
@@ -93,6 +99,15 @@ export const TagService = {
         updated_at: new Date().toISOString()
       })
       .eq('id', id);
+
+    if (!error) {
+      await HistoryService.logActivity({
+        tagId: id,
+        action: 'RESET',
+        details: `Tag libéré et données effacées`,
+        reference: 'LIBÉRÉ'
+      });
+    }
 
     return !error;
   }
