@@ -17,8 +17,9 @@ export const TagService = {
     return {
       id: data.id,
       reference: data.reference,
+      category: data.category,
       // On s'assure que metadata est un objet, même si la colonne est vide
-      metadata: data.metadata || {}, 
+      metadata: data.metadata || {},
       isAssigned: data.is_assigned,
       createdAt: new Date(data.created_at),
     };
@@ -38,6 +39,7 @@ export const TagService = {
     return data.map(item => ({
       id: item.id,
       reference: item.reference,
+      category: item.category,
       metadata: item.metadata || {},
       isAssigned: item.is_assigned,
       createdAt: new Date(item.created_at)
@@ -53,6 +55,7 @@ export const TagService = {
       .upsert({
         id: tag.id,
         reference: tag.reference,
+        category: tag.category,
         is_assigned: tag.isAssigned,
         metadata: tag.metadata, // On envoie l'objet des champs dynamiques
         updated_at: new Date().toISOString(),
@@ -74,7 +77,7 @@ export const TagService = {
       .from("tags")
       .delete()
       .eq('id', id);
-    
+
     return !error;
   },
 

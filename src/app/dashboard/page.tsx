@@ -130,12 +130,19 @@ export default function DashboardPage() {
                 {/* HEADER CARTE */}
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-bold ${tag.isAssigned ? "bg-blue-50 text-blue-700" : "bg-gray-100 text-gray-500"
-                      }`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${tag.isAssigned ? "bg-blue-600" : "bg-gray-400"}`}></div>
-                      {tag.id}
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-bold ${tag.isAssigned ? "bg-blue-50 text-blue-700" : "bg-gray-100 text-gray-500"
+                        }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${tag.isAssigned ? "bg-blue-600" : "bg-gray-400"}`}></div>
+                        {tag.id}
+                      </div>
+                      {tag.category && (
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-1 rounded border border-gray-100">
+                          {tag.category}
+                        </span>
+                      )}
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mt-2">{tag.reference || "Tag Non Assigné"}</h3>
+                    <h3 className="text-lg font-bold text-gray-900">{tag.reference || "Tag Non Assigné"}</h3>
                     <p className="text-xs text-gray-500 mt-1">ID: {tag.id}</p>
                   </div>
                 </div>

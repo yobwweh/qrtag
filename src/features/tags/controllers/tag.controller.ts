@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Tag, createEmptyTag } from "../models/tag.model";
 import { TagService } from "../services/tag.service";
+import { TAG_TEMPLATES } from "../models/tag.templates";
 
 export const useTagController = (tagId: string) => {
   const [tag, setTag] = useState<Tag>(createEmptyTag(tagId));
@@ -33,6 +34,19 @@ export const useTagController = (tagId: string) => {
     });
   };
 
+  const setCategory = (category: string) => {
+    const template = TAG_TEMPLATES[category];
+    if (template) {
+      setTag(prev => ({
+        ...prev,
+        category: category,
+        metadata: { ...template.defaultMetadata } // Reset avec les champs par défaut
+      }));
+    } else {
+      setTag(prev => ({ ...prev, category }));
+    }
+  };
+
   const handleSave = async (reference: string) => {
     setIsSubmitting(true);
     const updatedTag = { ...tag, reference, isAssigned: true };
@@ -58,5 +72,5 @@ export const useTagController = (tagId: string) => {
     setIsSubmitting(false);
   };
 
-  return { tag, loading, isSubmitting, handleSave, updateLocalMetadata, removeLocalField, handleReset };
+  return { tag, loading, isSubmitting, handleSave, updateLocalMetadata, removeLocalField, handleReset, setCategory };
 };

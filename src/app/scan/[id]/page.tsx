@@ -5,10 +5,11 @@ import { useTagController } from "@/features/tags/controllers/tag.controller";
 import Link from "next/link";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { UserMenu } from "@/components/UserMenu";
+import { TAG_TEMPLATES } from "@/features/tags/models/tag.templates";
 
 export default function ScanPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { tag, loading, isSubmitting, handleSave, updateLocalMetadata, removeLocalField, handleReset } = useTagController(id);
+  const { tag, loading, isSubmitting, handleSave, updateLocalMetadata, removeLocalField, handleReset, setCategory } = useTagController(id);
 
   const [refValue, setRefValue] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -113,18 +114,40 @@ export default function ScanPage({ params }: { params: Promise<{ id: string }> }
             </p>
           </div>
 
+          {/* SÉLECTEUR DE CATÉGORIE */}
+          <div className="mb-6">
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">
+              Type d'Actif à Injecter
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {Object.values(TAG_TEMPLATES).map((tmpl) => (
+                <button
+                  key={tmpl.id}
+                  onClick={() => setCategory(tmpl.id)}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${tag.category === tmpl.id
+                    ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100 scale-[1.02]"
+                    : "bg-white border-gray-100 text-gray-500 hover:border-blue-100 hover:bg-blue-50/30"
+                    }`}
+                >
+                  <span className="text-2xl">{tmpl.icon}</span>
+                  <span className="text-[10px] font-black uppercase tracking-tight">{tmpl.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* FORMULAIRE */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <div className="space-y-6">
               {/* Référence */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Numéro de Lot / Produit
+                  {TAG_TEMPLATES[tag.category || "Produit"]?.label} - Désignation
                 </label>
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="e.g. B-2023-001"
+                  placeholder={TAG_TEMPLATES[tag.category || "Produit"]?.placeholder}
                   value={refValue}
                   onChange={(e) => {
                     setRefValue(e.target.value);
@@ -168,7 +191,9 @@ export default function ScanPage({ params }: { params: Promise<{ id: string }> }
               {/* Métadonnées existantes */}
               {Object.entries(tag.metadata).length > 0 && (
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide">Détails Personnalisés</h3>
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide">
+                    Détails du Template : {TAG_TEMPLATES[tag.category || "Produit"]?.label}
+                  </h3>
                   {Object.entries(tag.metadata).map(([key, value]) => (
                     <div key={key}>
                       <label className="block text-xs font-semibold text-gray-500 mb-1.5 capitalize">
